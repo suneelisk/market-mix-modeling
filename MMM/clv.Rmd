@@ -1,0 +1,173 @@
+---
+title: "seaportai"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{css}
+pre code, pre, code {
+  white-space: pre !important;
+  overflow-x: scroll !important;
+  word-break: keep-all !important;
+  word-wrap: initial !important;
+}
+```
+
+
+
+
+```{r setup, include=FALSE}
+library(shiny)
+library(flexdashboard)
+library(knitr)
+library(reticulate)
+library(data.table)
+library(rsconnect)
+py_install("pandas")
+py_install("lifetimes")
+```
+
+
+
+
+**CLV**
+===========================================
+
+```{r, e}
+fileInput("file","Upload",accept = c(".csv"))
+options(shiny.maxRequestSize=100*1024^2)
+actionButton("submit", "Submit")
+v <- reactiveValues()
+renderUI(v[["py_chunk"]])
+
+observeEvent(
+  input$submit,
+  {
+    var <- input$text
+    data=read.csv(input$file$datapath)
+    # Each chunk line is an element of the vector
+    py_code <- c(
+      "```{python,echo=FALSE}",
+
+"import pandas as pd",
+"import numpy as np",
+"import seaborn as sns",
+"import datetime as dt",
+"import lifetimes",
+"from lifetimes import plotting",
+"from lifetimes import utils",
+"from lifetimes import estimation",
+"from lifetimes.utils import summary_data_from_transaction_data",
+"from lifetimes import BetaGeoFitter",
+"from lifetimes.plotting import plot_period_transactions",
+"from lifetimes.utils import calibration_and_holdout_data",
+"from lifetimes import GammaGammaFitter",
+"import tkinter",
+"from tkinter import *",
+"import seaborn as sns",
+
+"data=pd.DataFrame(r.data)",
+
+
+"data['price']=data.Quantity*data.UnitPrice",
+
+"data['InvoiceDate'] = pd.to_datetime(data['InvoiceDate']).dt.date",
+
+"data = data[pd.notnull(data['CustomerID'])]",
+
+"data = data[(data['Quantity']>0)]",
+
+"cols_of_interest = ['CustomerID', 'InvoiceDate', 'price']",
+
+"data = data[cols_of_interest]",
+
+"data1 = summary_data_from_transaction_data(data, 'CustomerID', 'InvoiceDate', monetary_value_col='price', observation_period_end='2011-9-12')",
+"bgf = BetaGeoFitter(penalizer_coef=0.0)",
+
+"bgf.fit(data1['frequency'], data1['recency'], data1['T'])",
+"t = 1" ,
+
+"data1['predicted_purchases'] = bgf.conditional_expected_number_of_purchases_up_to_time(t, data1['frequency'],    data1['recency'], data1['T'])",
+
+
+ "summary_cal_holdout = calibration_and_holdout_data(data, 'CustomerID', 'InvoiceDate',
+                                         calibration_period_end='2011-08-06',
+                                         observation_period_end='2011-9-12' ) " , 
+                                        
+"returning_customers_summary = data1[data1['frequency']>0]",
+
+"ggf = GammaGammaFitter(penalizer_coef = 0)",
+
+"ggf.fit(returning_customers_summary['frequency'],
+        returning_customers_summary['monetary_value'])",
+        
+"bgf.fit(data1['frequency'], data1['recency'], data1['T'])",
+
+"out=ggf.customer_lifetime_value(
+  bgf, #the model to use to predict the number of future transactions
+  data1['frequency'],
+  data1['recency'],
+  data1['T'],
+  data1['monetary_value'],
+  time=90, # months
+  discount_rate=0.01)",
+"output=np.round(pd.DataFrame(out),decimals=2)",
+"output=output.iloc[1:]",
+"output.reset_index(level=0, inplace=True)",
+
+"a=output[output['clv']<=2500]",
+"b=output[(output['clv'] >2500) & (output['clv'] <= 7500)]",
+"c=output[output['clv'] > 7500]",
+"a.columns = ['CustomerID','less profitable customers']",
+"b.columns = ['CustomerID','medium profitable customers']",
+"c.columns = ['CustomerID','more profitable customers']",
+
+# "ss=pd.DataFrame({'less profitable customers':a,
+#                              'medium profitable customers':b,
+#                              'more profitable customers':c})",
+
+"print(c)",
+      "```"
+    )
+  "```"
+  "**sdkjfh**"
+"=============================="
+"sns.barplot(x='CustomerID', y='clv', data=a, saturation=0.8)"
+    
+    # Make sure knitr's converting to HTML
+    knitr::render_html()
+    # Then store the output in the reactive value
+    v[["py_chunk"]] <- HTML(knitr::knit(text = py_code))
+  }
+)
+```
+
+**GRAPH**
+===================================
+
+```{r, echo=FALSE}
+library("knitr")
+
+
+aa=py$a
+bb=py$b
+cc=py$c
+
+# a=data[data$clv <= 2500,]
+# #names(a)[names(a) == "clv"] = "less profitable customers"
+# b=data[data$clv > 2500 & data$clv <=7500,]
+# #names(b)[names(b) == "clv"] = "medium profitable customers"
+# c=data[data$clv > 7500,]
+# names(c)[names(c) == "clv"] = "more profitable customers"
+zz= merge(aa,bb ,all = TRUE)
+xx= merge(zz,cc,all = TRUE)
+
+xx[is.na(xx)] <- 0
+xx
+
+```
+
+

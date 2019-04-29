@@ -1,0 +1,12 @@
+name: admin
+title: admin
+username:
+account: seaport
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 625000
+bundleId: 1790909
+url: https://seaport.shinyapps.io/admin/
+when: 1546276595.93434
+asMultiple: FALSE
+asStatic: FALSE
