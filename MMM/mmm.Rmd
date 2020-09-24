@@ -1,5 +1,5 @@
 ---
-title: 'SeaportAI (Analytics|Robotics)'
+title: 'ISKISK'
 
 output:
   flexdashboard::flex_dashboard:
@@ -103,7 +103,7 @@ output[["fileupload"]] <- renderUI({
 
 output[["checkbox"]] <- renderUI({
       input$reset
-      tags$div(checkboxInput("check",tags$a(href = "http://seaportai.com/privacy-policy/", "Terms & Conditions",style="color:green;"),value = TRUE),align="center")
+      tags$div(checkboxInput("check",tags$a(href = "###", "Terms & Conditions",style="color:green;"),value = TRUE),align="center")
       
     })
 
@@ -255,7 +255,7 @@ tags$div(h5("and how much to spend on each marketing input.",style="text-align:c
                     uiOutput("helptext"),
                     br(),
                     br(),
-                   bsPopover(id="check",title = "",content = "Note: I accept the SeaportAI Terms & Conditions.. Show the Analyse button",placement = "right"),
+                   bsPopover(id="check",title = "",content = "Note: I accept the ISKISK Terms & Conditions.. Show the Analyse button",placement = "right"),
                    tags$div(tags$a(href="javascript:history.go(0)",bsButton("reset", label = "Reset ?", icon =   icon("repeat",lib = "glyphicon"),block = F, style="danger"),style="text-align:center"),align="center"),
                    
                            
@@ -264,7 +264,7 @@ tags$div(h5("and how much to spend on each marketing input.",style="text-align:c
                    
                    tags$div(class = "header", checked = NA,style="text-align:center;color:#929292;font-size:100%",
                             tags$tbody("Need Help ?"),
-                            tags$a(href = "http://seaportai.com/contact-us/", "Contact Us...")
+                            tags$a(href = "###", "Contact Us...")
                    )
                   )
                   )
